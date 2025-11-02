@@ -23,7 +23,7 @@ import { toast } from 'sonner'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
 interface TeamMemberFormData {
-  name: string
+  name: string | null
   email: string
   title: string
   department: string
