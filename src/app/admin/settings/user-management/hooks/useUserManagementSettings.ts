@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { UserManagementSettings } from '../types'
 import { apiFetch } from '@/lib/api'
 import { toast } from 'sonner'
 import { globalEventEmitter } from '@/lib/event-emitter'
+import { AuditLoggingService, AuditActionType, AuditSeverity } from '@/services/audit-logging.service'
 
 interface UseUserManagementSettingsReturn {
   settings: UserManagementSettings | null
