@@ -51,17 +51,29 @@ import ImpactPreviewPanel from './ImpactPreviewPanel'
  * Props for the UnifiedPermissionModal component
  */
 export interface UnifiedPermissionModalProps {
-  mode: 'user' | 'role' | 'bulk-users'
+  mode: 'user' | 'role' | 'bulk-users' | 'role-create' | 'role-edit'
   targetId: string | string[]
   currentRole?: string
   currentPermissions?: Permission[]
-  onSave: (changes: PermissionChangeSet) => Promise<void>
+  onSave: (changes: PermissionChangeSet | RoleFormData) => Promise<void>
   onClose: () => void
   showTemplates?: boolean
   showHistory?: boolean
   allowCustomPermissions?: boolean
   targetName?: string
   targetEmail?: string
+  /** For role creation/editing */
+  roleData?: RoleFormData
+}
+
+/**
+ * Role form data for role creation/editing
+ */
+export interface RoleFormData {
+  id?: string
+  name: string
+  description: string
+  permissions: Permission[]
 }
 
 /**
