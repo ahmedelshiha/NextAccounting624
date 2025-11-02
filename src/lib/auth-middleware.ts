@@ -293,9 +293,9 @@ export function withPublicAuth(handler: MiddlewareHandler) {
       // Try to get session, but don't fail if not found
       const session = await getServerSession(authOptions)
 
-      if (session?.user?.email) {
+      if (session?.user?.id) {
         const user = await prisma.user.findUnique({
-          where: { email: session.user.email },
+          where: { id: session.user.id },
           select: {
             id: true,
             tenantId: true,
