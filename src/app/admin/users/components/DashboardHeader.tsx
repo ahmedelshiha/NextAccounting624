@@ -53,17 +53,17 @@ export const DashboardHeader = memo(function DashboardHeader({
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header with Title and Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Users className="h-8 w-8 text-blue-600" />
-            User Management
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3 truncate">
+            <Users className="h-6 sm:h-8 w-6 sm:w-8 text-blue-600 flex-shrink-0" />
+            <span>User Management</span>
           </h1>
-          <p className="text-gray-600 mt-2">Manage users, roles, and monitor activity</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 truncate">Manage users, roles, and monitor activity</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
           <Button
             variant="outline"
             onClick={onRefresh}
