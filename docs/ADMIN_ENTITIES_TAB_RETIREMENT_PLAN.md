@@ -231,3 +231,71 @@
 - User Directory is visible above the fold on desktop; <2 clicks to common actions.
 - Filters are sticky; saved views persist via URL; virtualized grid remains smooth at 1k+ rows.
 - Drawer interaction avoids page navigation; bulk bar appears contextually; all actions RBAC-gated.
+
+---
+
+## Admin/Users Code Audit Findings (pre-implementation reference)
+
+### Entry Points & Tabs
+- `src/app/admin/users/page.tsx` → renders `EnterpriseUsersPage` with Suspense.
+- `src/app/admin/users/EnterpriseUsersPage.tsx` orchestrates tabs via `TabNavigation` and loads:
+  - `ExecutiveDashboardTab` (Dashboard)
+  - `EntitiesTab` (Clients/Team)
+  - lazy: `WorkflowsTab`, `BulkOperationsTab`, `AuditTab`, `AdminTab`
+  - `RbacTab` (Roles & Permissions)
+- Query param `?tab=` initializes active tab; valid set includes `entities` (to retire).
+- Global actions wired: Add User (opens `CreateUserModal`), Import, Bulk, Export (CSV), Refresh.
+
+### State & Context Architecture
+- Unified provider: `src/app/admin/users/contexts/UsersContextProvider.tsx` composes:
+  - `UserDataContext` (data, stats, refresh)
+  - `UserUIContext` (dialogs/profile state)
+  - `UserFilterContext` (filters + `getFilteredUsers`)
+- `useUserManagementRealtime` keeps user list in sync (debounced, autoRefresh).
+- `UserItem` includes extended fields (tier, workingHours, bookingBuffer, autoAssign, certifications, experienceYears, department, position, skills, hourlyRate).
+
+### Key Components
+- `ExecutiveDashboardTab.tsx`
+  - Internal sub-tabs: `Overview` and `Operations` (current UX concern: directory in Operations below KPIs).
+  - Uses `useDashboardMetrics`, `useDashboardAnalytics`, `useDashboardRecommendations` (dynamic data),
+    server-side filtering when filters active (`useServerSideFiltering`), otherwise `useFilterUsers`.
+  - Bulk actions UI (role/status/department) with toasts.
+- `UsersTable.tsx`
+  - Virtualized list via `VirtualScroller` (60vh viewport), selection with tri-state “select all”, inline role change, accessible labels.
+- `RbacTab.tsx`
+  - 4 subtabs: Roles, Hierarchy (`PermissionHierarchy`), Test Access (`PermissionSimulator`), Conflicts (`ConflictResolver`).
+  - CRUD via `/api/admin/roles`, `UnifiedPermissionModal` for create/edit.
+- `EntitiesTab.tsx`
+  - Sub-tabs Clients/Team; Clients uses `ClientService.list` and `/api/admin/entities/clients/[id]` for delete; Team uses `TeamManagement` + `TeamMemberFormModal`.
+
+### Hooks & Services
+- `useUnifiedUserService.ts`
+  - Auto-picks endpoint: `/api/admin/users/search` when filters provided, else `/api/admin/users`.
+  - 30s cache, dedupe, exponential backoff, abort, timeout, normalized responses.
+- `useFilterUsers.ts`
+  - Client-side filter + server query builder; supports role/status/department/tier; default search fields: name,email,company; date sort.
+
+### APIs Touched
+- `/api/admin/users`, `/api/admin/users/search`, `/api/admin/users/stats` (dashboard).
+- `/api/admin/roles` (RBAC).
+- `/api/admin/entities/clients` and `/api/admin/entities/clients/[id]` (to deprecate).
+
+### Accessibility & Perf
+- ErrorBoundaries per tab, Suspense fallbacks, skeleton UIs.
+- ARIA roles for grid, status, toolbar; keyboard-friendly controls.
+- Code-splitting for heavier tabs.
+
+### Risks / Migration Notes
+- EntitiesTab present in `TabNavigation` and `EnterpriseUsersPage`; remove both.
+- Clients/Team modals depend on legacy services; adopt `UnifiedUserFormModal` and `/api/admin/users`.
+- Ensure `?tab=entities` redirects to `?tab=dashboard&role=…` and URL param parser applies filters.
+
+### Test Impact (to update)
+- `e2e/tests/admin-entities-tab.spec.ts` (remove)
+- `e2e/tests/admin-unified-redirects.spec.ts` (assert Dashboard + role chip)
+- `e2e/tests/phase3-virtual-scrolling.spec.ts` (navigate dashboard directly)
+- `e2e/tests/admin-add-user-flow.spec.ts` (replace Entities flow with Dashboard flow)
+
+### Feature Flags (recommended)
+- `RETIRE_ENTITIES_TAB` – remove Entities UI and update redirects.
+- `DASHBOARD_SINGLE_PAGE` – enable work-area layout, compact infolets, left filter rail, saved views.
