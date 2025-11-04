@@ -36,7 +36,7 @@ interface ExecutiveDashboardTabProps {
 
 /**
  * Executive Dashboard Tab
- * 
+ *
  * Enhanced dashboard with:
  * - Real-time KPI metrics (Total Users, Active Users, etc.)
  * - AI-powered recommendations
@@ -53,6 +53,7 @@ export function ExecutiveDashboardTab({
   onExport,
   onRefresh
 }: ExecutiveDashboardTabProps) {
+  const context = useUsersContext()
   const { data: metricsData, isLoading: metricsLoading } = useDashboardMetrics()
   const { data: recommendations, isLoading: recsLoading } = useDashboardRecommendations()
   const { data: analyticsData, isLoading: analyticsLoading } = useDashboardAnalytics()
