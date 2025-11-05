@@ -1,49 +1,89 @@
 'use client'
 
 import { memo } from 'react'
+import { X } from 'lucide-react'
 import type { WorkstationInsightsPanelProps } from '../../types/workstation'
+import './workstation.css'
 
 export const WorkstationInsightsPanel = memo(function WorkstationInsightsPanel({
-  isOpen,
+  isOpen = true,
   onClose,
   stats,
   analyticsData,
 }: WorkstationInsightsPanelProps) {
   return (
-    <div className="workstation-insights-content">
-      <div className="insights-header">
-        <h3 className="insights-title">Analytics</h3>
+    <div className="workstation-insights-panel">
+      {/* Header */}
+      <header className="insights-header">
+        <h2 className="insights-title">Analytics</h2>
         <button
           className="insights-close-btn"
           onClick={onClose}
           aria-label="Close insights panel"
+          title="Close insights panel (mobile)"
         >
-          ✕
+          <X size={20} />
         </button>
-      </div>
+      </header>
 
-      <div className="insights-section">
-        <h4 className="insights-subtitle">User Growth</h4>
-        {/* UserGrowthChart will be lazy loaded here */}
-        <div className="insights-placeholder">User Growth Chart Component</div>
-      </div>
+      {/* Content */}
+      <div className="insights-content">
+        {/* Summary Stats Section */}
+        {stats && (
+          <section className="insights-section" aria-label="Summary Statistics">
+            <h3 className="section-title">Summary</h3>
+            <div className="insights-stats-summary">
+              <div className="summary-item">
+                <span className="summary-label">Total</span>
+                <span className="summary-value">{stats.total || 0}</span>
+              </div>
+              <div className="summary-item">
+                <span className="summary-label">Clients</span>
+                <span className="summary-value">{stats.clients || 0}</span>
+              </div>
+              <div className="summary-item">
+                <span className="summary-label">Staff</span>
+                <span className="summary-value">{stats.staff || 0}</span>
+              </div>
+            </div>
+          </section>
+        )}
 
-      <div className="insights-section">
-        <h4 className="insights-subtitle">Role Distribution</h4>
-        {/* RoleDistribution will be lazy loaded here */}
-        <div className="insights-placeholder">Role Distribution Component</div>
-      </div>
+        {/* User Growth Chart */}
+        <section className="insights-section" aria-label="User Growth">
+          <h3 className="section-title">User Growth</h3>
+          <div className="chart-placeholder">
+            📈 User Growth Chart<br/>
+            <small>(Lazy loaded in Phase 3)</small>
+          </div>
+        </section>
 
-      <div className="insights-section">
-        <h4 className="insights-subtitle">Department Distribution</h4>
-        {/* DepartmentDistribution will be lazy loaded here */}
-        <div className="insights-placeholder">Department Distribution Component</div>
-      </div>
+        {/* Role Distribution */}
+        <section className="insights-section" aria-label="Role Distribution">
+          <h3 className="section-title">Role Distribution</h3>
+          <div className="chart-placeholder">
+            🍰 Role Distribution<br/>
+            <small>(Lazy loaded in Phase 3)</small>
+          </div>
+        </section>
 
-      <div className="insights-section flex-1 overflow-y-auto">
-        <h4 className="insights-subtitle">Recommended Actions</h4>
-        {/* RecommendedActionsPanel will be integrated here */}
-        <div className="insights-placeholder">Recommended Actions Component</div>
+        {/* Department Distribution */}
+        <section className="insights-section" aria-label="Department Distribution">
+          <h3 className="section-title">Department Distribution</h3>
+          <div className="chart-placeholder">
+            📊 Department Distribution<br/>
+            <small>(Lazy loaded in Phase 3)</small>
+          </div>
+        </section>
+
+        {/* Recommended Actions */}
+        <section className="insights-section" aria-label="Recommended Actions">
+          <h3 className="section-title">Recommended Actions</h3>
+          <div className="actions-placeholder">
+            💡 Recommended Actions<br/>
+            <small>(Integrated in Phase 3)</small>
+          </div>
+        </section>
       </div>
     </div>
   )
