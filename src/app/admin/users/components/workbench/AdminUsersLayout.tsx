@@ -5,7 +5,6 @@ import { QuickActionsBar } from '../QuickActionsBar'
 import { ImportWizard } from '../ImportWizard'
 import OverviewCards from './OverviewCards'
 import AdminSidebar from './AdminSidebar'
-import DirectoryHeader from './DirectoryHeader'
 import UserDirectorySection from './UserDirectorySection'
 import BulkActionsPanel from './BulkActionsPanel'
 import { BuilderHeaderSlot, BuilderMetricsSlot, BuilderSidebarSlot, BuilderFooterSlot } from './BuilderSlots'
@@ -20,7 +19,7 @@ import '../styles/admin-users-layout.css'
  * Layout structure:
  * ┌─────────────────────────────────────────────┐
  * │        Sticky Header: QuickActionsBar        │
- * ├──────────────┬─────────────────────────���──┤
+ * ├──────────────┬─────────────────��───────���──┤
  * │              │                            │
  * │   Sidebar    │     Main Content Area      │
  * │  (Analytics  │   ┌──────────────────��    │
@@ -45,7 +44,6 @@ export default function AdminUsersLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filters, setFilters] = useState<Record<string, any>>({})
   const [showImportWizard, setShowImportWizard] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
   const isBuilderEnabled = useIsBuilderEnabled()
 
   const selectedCount = useMemo(() => selectedUserIds.size, [selectedUserIds.size])
@@ -56,7 +54,6 @@ export default function AdminUsersLayout() {
 
   const handleAddUser = () => {
     console.log('Add User clicked')
-    // TODO: Implement add user functionality (open modal or navigate)
     toast.info('Add User feature coming soon')
   }
 
@@ -68,14 +65,10 @@ export default function AdminUsersLayout() {
   const handleExport = async () => {
     console.log('Export clicked')
     try {
-      setIsExporting(true)
-      // TODO: Implement actual export functionality
       toast.success('Export feature coming soon')
     } catch (error) {
       toast.error('Failed to export users')
       console.error('Export error:', error)
-    } finally {
-      setIsExporting(false)
     }
   }
 
@@ -129,11 +122,6 @@ export default function AdminUsersLayout() {
 
           {/* User Directory Section */}
           <div className="admin-workbench-directory">
-            <DirectoryHeader
-              selectedCount={selectedCount}
-              onClearSelection={handleClearSelection}
-              onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-            />
             <UserDirectorySection
               selectedUserIds={selectedUserIds}
               onSelectionChange={setSelectedUserIds}
