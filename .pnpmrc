@@ -1,0 +1,4 @@
+store-dir=~/.pnpm-store
+prefer-offline=true
+fetch-timeout=60000
+progress=false

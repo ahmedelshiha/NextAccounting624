@@ -1,0 +1,11 @@
+[tools]
+node = "20.19.5"
+pnpm = "10.18.1"
+
+[env]
+NEXT_TELEMETRY_DISABLED = "1"
+COREPACK_ENABLE = "0"
+
+[tasks]
+# Speed up installs by ensuring pnpm is available and corepack is disabled
+preinstall = "corepack disable || true"

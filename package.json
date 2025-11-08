@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "pnpm": ">=10.18.1"
   },
   "scripts": {
+    "preinstall": "corepack disable || true",
     "dev": "pnpm run next-dev",
     "next-dev": "next dev",
     "build": "bash scripts/check-required-envs.sh && prisma generate && pnpm lint && pnpm typecheck && next build",

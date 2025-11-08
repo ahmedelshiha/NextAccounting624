@@ -11,8 +11,20 @@ const nextConfig = {
   // Allow Builder preview domain to access dev resources like /_next/* during development
   allowedDevOrigins: ["*.projects.builder.codes", "*.fly.dev"],
   turbopack: {},
-  
-  
+
+  optimizePackageImports: ['lucide-react', 'date-fns', 'lodash'],
+
+  modularizeImports: {
+    'date-fns': {
+      transform: 'date-fns/{{member}}',
+      preventFullImport: true,
+    },
+    lodash: {
+      transform: 'lodash/{{member}}',
+      preventFullImport: true,
+    },
+  },
+
   // External packages for server components
   serverExternalPackages: ['@sentry/nextjs', 'ioredis'],
   // Prevent bundling node built-ins into client bundles (stubs for Turbopack/webpack)
@@ -34,9 +46,8 @@ const nextConfig = {
   
   // Experimental features for better performance
   experimental: {
-    // Removed optimizeCss - requires additional critters dependency
-    // optimizeCss: true,
-    // swcMinify is now enabled by default in Next.js 13+
+    webpackBuildWorker: true,
+    optimizeCss: true,
   },
   async headers() {
     const csp = [

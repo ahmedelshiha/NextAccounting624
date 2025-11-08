@@ -11,6 +11,10 @@
   NPM_FLAGS = "--no-frozen-lockfile"
   RUN_DB_MIGRATIONS = "false"
   RUN_E2E = "false"
+  COREPACK_ENABLE = "0"
+  NPM_CONFIG_FETCH_TIMEOUT = "60000"
+  PNPM_CACHE_DIR = "/opt/buildhome/.pnpm-store"
+  NEXT_TELEMETRY_DISABLED = "1"
 
 [context.deploy-preview]
   command = "pnpm db:generate && echo 'Skipping Prisma migrate/seed in deploy-preview' && pnpm lint && pnpm typecheck && pnpm build"
