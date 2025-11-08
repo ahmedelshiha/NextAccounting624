@@ -17,7 +17,7 @@ import '../styles/admin-users-layout.css'
  * Layout structure:
  * ┌─────────────────────────────────────────────┐
  * │        Sticky Header: QuickActionsBar        │
- * ├──────────────┬─────────────────────────���──┤
+ * ├─────────────���┬─────────────────────────���──┤
  * │              │                            │
  * │   Sidebar    │     Main Content Area      │
  * │  (Analytics  │   ┌──────────────────┐    │
@@ -47,6 +47,27 @@ export default function AdminUsersLayout() {
 
   const handleClearSelection = () => {
     setSelectedUserIds(new Set())
+  }
+
+  const handleAddUser = () => {
+    console.log('Add User clicked')
+    // TODO: Open add user modal or navigate to add user page
+  }
+
+  const handleImport = () => {
+    console.log('Import clicked')
+    // TODO: Open import wizard
+  }
+
+  const handleExport = () => {
+    console.log('Export clicked')
+    // TODO: Export users
+  }
+
+  const handleRefresh = () => {
+    console.log('Refresh clicked')
+    // TODO: Refresh users data
+    window.location.reload()
   }
 
   return (
