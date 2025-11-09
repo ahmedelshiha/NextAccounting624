@@ -159,6 +159,12 @@ export const GET = withTenantContext(async (request: Request) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        availabilityStatus: user.availabilityStatus, // Added missing field
+        department: user.department, // Added missing field
+        position: user.position, // Added missing field
+        tier: user.tier, // Added missing field
+        experienceYears: user.experienceYears, // Added missing field
+        image: user.image, // Added missing field
         createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
         updatedAt: user.updatedAt ? (user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt) : (user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt)
       }))
