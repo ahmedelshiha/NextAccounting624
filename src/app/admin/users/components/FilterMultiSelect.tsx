@@ -17,7 +17,7 @@ export interface FilterMultiSelectProps {
   selectedValues: string[]
   onToggle: (value: string) => void
   onClear: () => void
-  aria-label?: string
+  ariaLabel?: string
 }
 
 export function FilterMultiSelect({
@@ -27,7 +27,7 @@ export function FilterMultiSelect({
   selectedValues,
   onToggle,
   onClear,
-  'aria-label': ariaLabel
+  ariaLabel
 }: FilterMultiSelectProps) {
   const [open, setOpen] = useState(false)
 
@@ -51,13 +51,11 @@ export function FilterMultiSelect({
 
       {open && (
         <>
-          {/* Backdrop to close dropdown */}
           <div
             className="fixed inset-0 z-30"
             onClick={() => setOpen(false)}
           />
           
-          {/* Dropdown menu */}
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-40 max-h-64 overflow-y-auto">
             {selectedValues.length > 0 && (
               <div className="px-3 py-2 border-b border-gray-200 flex items-center justify-between gap-2 sticky top-0 bg-gray-50">
