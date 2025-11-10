@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -8,6 +8,8 @@ import { X } from 'lucide-react'
 import { FilterMultiSelect, FilterOption } from './FilterMultiSelect'
 import { FilterPills } from './FilterPill'
 import { ExportButton } from './ExportButton'
+import { SearchSuggestionsDropdown } from './SearchSuggestionsDropdown'
+import { useSearchSuggestions } from '../hooks/useSearchSuggestions'
 import { FilterState } from '../hooks/useFilterState'
 import { UserItem } from '../contexts/UserDataContext'
 
