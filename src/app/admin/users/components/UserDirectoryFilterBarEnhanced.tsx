@@ -119,14 +119,15 @@ export function UserDirectoryFilterBarEnhanced({
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    const next = { ...filters, search: value }
+    const next: FilterState = { ...filters, search: value, roles: filters.roles || [], statuses: filters.statuses || [] }
     onFiltersChange(next)
     setSuggestionsOpen(!!value)
     filterHistory.addEntry(next)
   }, [filters, onFiltersChange, filterHistory])
 
   const handleSuggestionSelect = useCallback((suggestion: any) => {
-    onFiltersChange({ ...filters, search: suggestion.text })
+    const next: FilterState = { ...filters, search: suggestion.text, roles: filters.roles || [], statuses: filters.statuses || [] }
+    onFiltersChange(next)
     setSuggestionsOpen(false)
   }, [filters, onFiltersChange])
 
@@ -379,7 +380,7 @@ export function UserDirectoryFilterBarEnhanced({
         isOpen={historyOpen}
         onOpenChange={setHistoryOpen}
         history={filterHistory.history}
-        onReapply={(f) => { onFiltersChange(f); filterHistory.addEntry(f); setHistoryOpen(false) }}
+        onReapply={(f) => { const next: FilterState = { search: f.search || '', roles: f.roles || [], statuses: f.statuses || [] }; onFiltersChange(next); filterHistory.addEntry(next); setHistoryOpen(false) }}
         onClearHistory={() => filterHistory.clearHistory()}
         onExportHistory={() => filterHistory.exportHistory()}
         helpers={{ relativeTime: filterHistory.helpers.relativeTime, describeFilters: filterHistory.helpers.describeFilters }}
