@@ -322,9 +322,7 @@ export class WebhookIntegrationService {
     }
 
     // Create signature using HMAC-SHA256
-    const crypto = require('crypto')
-    const signature = crypto
-      .createHmac('sha256', this.secret)
+    const signature = createHmac('sha256', this.secret)
       .update(JSON.stringify(payload))
       .digest('hex')
 
