@@ -89,6 +89,7 @@ export default function NewStartupTab({
 
   const selectedCountry = watch("country");
   const selectedForm = watch("legalForm");
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const onSubmit = async (data: NewStartupInput) => {
     try {
