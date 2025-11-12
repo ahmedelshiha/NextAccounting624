@@ -221,9 +221,8 @@ export function computeDataHash(
   record: Record<string, any>,
   fieldsToHash: string[]
 ): string {
-  const crypto = require('crypto')
   const data = fieldsToHash.map(f => record[f]).join('|')
-  return crypto.createHash('sha256').update(data).digest('hex')
+  return createHash('sha256').update(data).digest('hex')
 }
 
 /**
