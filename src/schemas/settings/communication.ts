@@ -76,7 +76,7 @@ export const CommunicationNewslettersSchema = z.object({
   doubleOptIn: z.boolean().default(true),
   defaultSenderName: z.string().max(120).default(''),
   defaultSenderEmail: z.string().email().default(''),
-  archiveUrl: z.string().url().optional().default(''),
+  archiveUrl: z.string().url().default(''),
   topics: z.array(NewsletterTopicSchema).max(25).default([]),
 })
 
