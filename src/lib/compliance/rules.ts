@@ -312,7 +312,8 @@ export function calculateObligations(
 /**
  * Calculate next filing date based on country and obligation type
  */
-function calculateNextFilingDate(country: CountryCode, obligationType: string): Date {
+function calculateNextFilingDate(countryCode: string, obligationType: string): Date {
+  const country = countryCode as CountryCode;
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
