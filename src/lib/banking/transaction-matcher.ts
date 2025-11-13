@@ -141,14 +141,9 @@ export async function matchTransactionsToInvoices(
             score += 0.25 // Close match
           }
 
-          // Description similarity
-          const descriptionScore = calculateStringSimilarity(
-            txn.description,
-            invoice.description || ''
-          )
-
-          if (descriptionScore >= criteria.descriptionSimilarity) {
-            score += 0.5 * descriptionScore
+          // Invoice number matching (if transaction description contains invoice number)
+          if (invoice.number && txn.description.includes(invoice.number)) {
+            score += 0.3 // Invoice number match bonus
           }
 
           if (score > bestScore) {
