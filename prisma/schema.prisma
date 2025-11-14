@@ -99,18 +99,19 @@ model User {
   bulkOperationHistoryChanges BulkOperationHistory[] @relation("BulkOperationHistoryChangedBy")
   reports                   Report[]
   exportSchedules           ExportSchedule[]
-  entitiesCreated           Entity[]              @relation("EntityCreatedBy")
-  entitiesUpdated           Entity[]              @relation("EntityUpdatedBy")
-  filingPeriodAssignments   FilingPeriod[]        @relation("FilingPeriodAssignee")
+  entitiesCreated           Entity[]                @relation("EntityCreatedBy")
+  entitiesUpdated           Entity[]                @relation("EntityUpdatedBy")
+  filingPeriodAssignments   FilingPeriod[]          @relation("FilingPeriodAssignee")
   consentsAccepted          Consent[]
-  verificationAttempts      VerificationAttempt[] @relation("VerificationAttemptBy")
+  verificationAttempts      VerificationAttempt[]   @relation("VerificationAttemptBy")
   entityAuditLogs           EntityAuditLog[]
-  documentVersions          DocumentVersion[]     @relation("DocumentVersionUploader")
-  supportTicketsCreated     SupportTicket[]       @relation("SupportTicketsCreated")
-  supportTicketsAssigned    SupportTicket[]       @relation("SupportTicketsAssigned")
+  documentVersions          DocumentVersion[]       @relation("DocumentVersionUploader")
+  supportTicketsCreated     SupportTicket[]         @relation("SupportTicketsCreated")
+  supportTicketsAssigned    SupportTicket[]         @relation("SupportTicketsAssigned")
   supportTicketComments     SupportTicketComment[]  @relation("SupportTicketComments")
-  knowledgeBaseArticles     KnowledgeBaseArticle[] @relation("KnowledgeBaseArticles")
-  paymentMethods            UserPaymentMethod[]    @relation("UserPaymentMethods")
+  knowledgeBaseArticles     KnowledgeBaseArticle[]  @relation("UserToKnowledgeBaseArticle")
+  paymentMethods            UserPaymentMethod[]     @relation("UserToUserPaymentMethod")
+  userOnEntities            UserOnEntity[]
 
   @@unique([tenantId, email])
   @@index([tenantId, role])
@@ -361,22 +362,22 @@ model Tenant {
   entities              Entity[]
   consents              Consent[]
   verificationAttempts  VerificationAttempt[]
-  documentVersions      DocumentVersion[]     @relation("DocumentVersions")
-  documentLinks         DocumentLink[]        @relation("DocumentLinks")
-  documentAuditLogs     DocumentAuditLog[]    @relation("DocumentAuditLogs")
-  supportTickets        SupportTicket[]           @relation("SupportTickets")
-  knowledgeBaseCategories KnowledgeBaseCategory[]   @relation("KnowledgeBaseCategories")
-  knowledgeBaseArticles KnowledgeBaseArticle[]      @relation("KnowledgeBaseArticles")
-  userPaymentMethods    UserPaymentMethod[]        @relation("UserPaymentMethods")
-  bankingConnections    BankingConnection[]        @relation("BankingConnections")
-  bankingTransactions   BankingTransaction[]       @relation("BankingTransactions")
-  taxFilings            TaxFiling[]                @relation("TaxFilings")
-  parties               Party[]                    @relation("PartyMasterData")
-  products              Product[]                  @relation("ProductMasterData")
-  taxCodes              TaxCode[]                  @relation("TaxCodeMasterData")
-  mergeLogs             MergeLog[]                 @relation("MergeLogs")
-  survivorshipRules     SurvivorshipRule[]         @relation("SurvivorshipRules")
-  invitations           Invitation[] // Added missing relation field to Tenant model
+  documentVersions      DocumentVersion[]                 @relation("DocumentVersions")
+  documentLinks         DocumentLink[]                    @relation("DocumentLinks")
+  documentAuditLogs     DocumentAuditLog[]                @relation("DocumentAuditLogs")
+  supportTickets        SupportTicket[]                   @relation("SupportTickets")
+  knowledgeBaseCategories KnowledgeBaseCategory[]       @relation("KnowledgeBaseCategories")
+  knowledgeBaseArticles KnowledgeBaseArticle[]            @relation("TenantToKnowledgeBaseArticle")
+  userPaymentMethods    UserPaymentMethod[]               @relation("TenantToUserPaymentMethod")
+  bankingConnections    BankingConnection[]               @relation("BankingConnections")
+  bankingTransactions   BankingTransaction[]              @relation("BankingTransactions")
+  taxFilings            TaxFiling[]
+  parties               Party[]                           @relation("PartyMasterData")
+  products              Product[]                         @relation("ProductMasterData")
+  taxCodes              TaxCode[]                         @relation("TaxCodeMasterData")
+  mergeLogs             MergeLog[]                        @relation("MergeLogs")
+  survivorshipRules     SurvivorshipRule[]                @relation("SurvivorshipRules")
+  invitations           Invitation[]
 
   @@index([status])
 }
@@ -1226,8 +1227,8 @@ model UserPaymentMethod {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  user              User      @relation("UserPaymentMethods", fields: [userId], references: [id], onDelete: Cascade)
-  tenant            Tenant    @relation("UserPaymentMethods", fields: [tenantId], references: [id], onDelete: Cascade)
+  user              User      @relation("UserToUserPaymentMethod", fields: [userId], references: [id], onDelete: Cascade)
+  tenant            Tenant    @relation("TenantToUserPaymentMethod", fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@unique([userId, paymentMethodId])
   @@index([userId])
@@ -2060,7 +2061,7 @@ model KnowledgeBaseCategory {
   slug                  String                    @db.VarChar(255)
   description           String?                   @db.Text
   icon                  String?                   @db.VarChar(50)
-  order                  Int                       @default(0)
+  order                 Int                       @default(0)
   published             Boolean                   @default(true)
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
@@ -2094,9 +2095,9 @@ model KnowledgeBaseArticle {
   updatedAt             DateTime                  @updatedAt
   publishedAt           DateTime?
 
-  tenant                Tenant                    @relation("KnowledgeBaseArticles", fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant                Tenant                    @relation("TenantToKnowledgeBaseArticle", fields: [tenantId], references: [id], onDelete: Cascade)
   category              KnowledgeBaseCategory     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  author                User                      @relation("KnowledgeBaseArticles", fields: [authorId], references: [id], onDelete: Cascade)
+  author                User                      @relation("UserToKnowledgeBaseArticle", fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -2290,6 +2291,7 @@ model Entity {
   auditLogs             EntityAuditLog[]
   consents              Consent[]
   taxFilings            TaxFiling[]
+  userOnEntities        UserOnEntity[]
 
   @@unique([tenantId, name])
   @@index([tenantId, country])
@@ -2297,6 +2299,21 @@ model Entity {
   @@index([createdAt])
   @@index([tenantId, createdAt])
   @@map("entities")
+}
+
+model UserOnEntity {
+  id        String   @id @default(cuid())
+  userId    String
+  entityId  String
+  role      String?
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entity    Entity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, entityId])
+  @@index([entityId])
+  @@map("user_on_entities")
 }
 
 model EntityLicense {
@@ -2641,7 +2658,7 @@ model TaxFiling {
   updatedAt         DateTime                      @updatedAt
 
   // Relations
-  tenant            Tenant                        @relation("TaxFilings", fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant            Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   entity            Entity                        @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, country, taxType])
@@ -2671,16 +2688,16 @@ model Party {
   city                  String?                   @db.VarChar(100)
   country               String?                   @db.VarChar(2)
   status                PartyStatus               @default(ACTIVE) // ACTIVE, INACTIVE, MERGED, DELETED
-  
+
   // Master record tracking
   isMasterRecord        Boolean                   @default(false)
   masterRecordId        String?                   // Points to the master if this is a duplicate
-  
+
   // Data quality metrics
   dataQualityScore      Decimal                   @default(0) @db.Decimal(5, 2) // 0-100
   lastValidatedAt       DateTime?
   validationErrors      String[]                  @default([])
-  
+
   // Metadata
   metadata              Json?
   externalId            String?                   @db.VarChar(255)
@@ -2689,13 +2706,13 @@ model Party {
   updatedAt             DateTime                  @updatedAt
   createdBy             String?
   updatedBy             String?
-  
+
   // Relations
   tenant                Tenant                    @relation("PartyMasterData", fields: [tenantId], references: [id], onDelete: Cascade)
   masterRecord          Party?                    @relation("PartyDuplicates", fields: [masterRecordId], references: [id])
   duplicates            Party[]                   @relation("PartyDuplicates")
   products              Product[]                 @relation("PartyProducts")
-  
+
   @@unique([tenantId, registrationNumber])
   @@unique([tenantId, taxId])
   @@index([tenantId, partyType])
@@ -2716,28 +2733,28 @@ model Product {
   productType           ProductType               // GOOD, SERVICE, BUNDLE
   category              String?                   @db.VarChar(100)
   unitOfMeasure         String?                   @db.VarChar(50)
-  
+
   // Pricing
   standardPrice         Decimal?                  @db.Decimal(19, 4)
   currency              String?                   @db.VarChar(3) // ISO 4217
-  
+
   // Tax & Compliance
   taxCodeId             String?
   taxRate               Decimal?                  @db.Decimal(5, 2)
-  
+
   // Master record tracking
   isMasterRecord        Boolean                   @default(false)
   masterRecordId        String?
-  
+
   // Status & Lifecycle
   status                ProductStatus             @default(ACTIVE) // ACTIVE, INACTIVE, DISCONTINUED, MERGED
   effectiveFrom         DateTime?
   effectiveTo           DateTime?
-  
+
   // Data quality
   dataQualityScore      Decimal                   @default(0) @db.Decimal(5, 2)
   lastValidatedAt       DateTime?
-  
+
   // Metadata
   metadata              Json?
   externalId            String?                   @db.VarChar(255)
@@ -2746,14 +2763,14 @@ model Product {
   updatedAt             DateTime                  @updatedAt
   createdBy             String?
   updatedBy             String?
-  
+
   // Relations
   tenant                Tenant                    @relation("ProductMasterData", fields: [tenantId], references: [id], onDelete: Cascade)
   taxCode               TaxCode?                  @relation(fields: [taxCodeId], references: [id])
   masterRecord          Product?                  @relation("ProductDuplicates", fields: [masterRecordId], references: [id])
   duplicates            Product[]                 @relation("ProductDuplicates")
   party                 Party?                    @relation("PartyProducts", fields: [id], references: [id])
-  
+
   @@unique([tenantId, productCode])
   @@index([tenantId, productType])
   @@index([tenantId, status])
@@ -2772,16 +2789,16 @@ model TaxCode {
   taxType               TaxType                   // VAT, INCOME_TAX, WITHHOLDING, ZAKAT, etc.
   country               String                    @db.VarChar(2) // ISO 3166-1 alpha-2
   taxRate               Decimal                   @db.Decimal(5, 2)
-  
+
   // Master record tracking
   isMasterRecord        Boolean                   @default(false)
   masterRecordId        String?
-  
+
   // Status & Lifecycle
   status                TaxCodeStatus             @default(ACTIVE) // ACTIVE, INACTIVE, SUPERSEDED, MERGED
   effectiveFrom         DateTime
   effectiveTo           DateTime?
-  
+
   // Metadata
   metadata              Json?
   externalId            String?                   @db.VarChar(255)
@@ -2789,13 +2806,13 @@ model TaxCode {
   updatedAt             DateTime                  @updatedAt
   createdBy             String?
   updatedBy             String?
-  
+
   // Relations
   tenant                Tenant                    @relation("TaxCodeMasterData", fields: [tenantId], references: [id], onDelete: Cascade)
   masterRecord          TaxCode?                  @relation("TaxCodeDuplicates", fields: [masterRecordId], references: [id])
   duplicates            TaxCode[]                 @relation("TaxCodeDuplicates")
   products              Product[]
-  
+
   @@unique([tenantId, taxCodeValue, country])
   @@index([tenantId, taxType])
   @@index([tenantId, country])
@@ -2810,36 +2827,36 @@ model MergeLog {
   id                    String                    @id @default(cuid())
   tenantId              String
   recordType            MergeRecordType           // PARTY, PRODUCT, TAX_CODE
-  
+
   // Master and duplicate records
   masterRecordId        String
   masterRecordName      String                    @db.VarChar(255)
   duplicateRecordId     String
   duplicateRecordName   String                    @db.VarChar(255)
-  
+
   // Merge details
   mergeReason           String?                   @db.Text
   survivorshipRuleId    String?
   survivorshipStrategy  SurvivorshipStrategy      @default(MANUAL) // MANUAL, AUTOMATIC, RULE_BASED
-  
+
   // Merge result
   mergeStatus           MergeStatus               @default(PENDING) // PENDING, COMPLETED, FAILED, ROLLED_BACK
   mergeErrors           String[]                  @default([])
-  
+
   // Unmerge capability
   canUnmerge            Boolean                   @default(true)
   unmergeReason         String?                   @db.Text
   unmergedAt            DateTime?
   unmergedBy            String?
-  
+
   // Audit trail
   mergedAt              DateTime                  @default(now())
   mergedBy              String
   metadata              Json?
-  
+
   // Relations
   tenant                Tenant                    @relation("MergeLogs", fields: [tenantId], references: [id], onDelete: Cascade)
-  
+
   @@index([tenantId, recordType])
   @@index([tenantId, mergeStatus])
   @@index([masterRecordId])
@@ -2856,24 +2873,24 @@ model SurvivorshipRule {
   recordType            MergeRecordType           // PARTY, PRODUCT, TAX_CODE
   ruleName              String                    @db.VarChar(255)
   description           String?                   @db.Text
-  
+
   // Rule definition
   fieldMappings         Json                      // { "fieldName": "MASTER|DUPLICATE|NEWER|OLDER|CUSTOM" }
   customLogic           String?                   @db.Text // JavaScript or expression for custom logic
   priority              Int                       @default(0)
-  
+
   // Status
   isActive              Boolean                   @default(true)
-  
+
   // Metadata
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
   createdBy             String?
   updatedBy             String?
-  
+
   // Relations
   tenant                Tenant                    @relation("SurvivorshipRules", fields: [tenantId], references: [id], onDelete: Cascade)
-  
+
   @@unique([tenantId, ruleName])
   @@index([tenantId, recordType])
   @@index([tenantId, isActive])
